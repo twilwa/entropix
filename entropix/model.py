@@ -45,11 +45,11 @@ def attention(x: jax.Array, layer_weights: LayerWeights, model_params, cur_pos: 
 
     xq, xk = apply_rotary_emb(xq, xk, freqs_cis=freqs_cis)
 
-    keys, values, kvcache = kvcache.update(xk, xv, layer_idx, cur_pos, n_rep)
+    keys, values, kvcache = kvcache.update(xk, xv, layer_idx, cur_pos)
 
     xq = jnp.transpose(xq, (0, 2, 1, 3))  # (bsz, n_heads, seq_len, head_dim)
-    keys = jnp.transpose(keys, (0, 2, 1, 3))  # (bsz, kv_heads, total_seq_len, head_dim)
-    values = jnp.transpose(values, (0, 2, 1, 3))  # (bsz, kv_heads, total_seq_len, head_dim)
+    keys = jnp.transpose(keys, (1, 2, 0, 3))  # (bsz, kv_heads, total_seq_len, head_dim)
+    values = jnp.transpose(values, (1, 2, 0, 3))  # (bsz, kv_heads, total_seq_len, head_dim)
 
     if kv_heads != n_heads:
         keys = jnp.repeat(keys, n_rep, axis=1)
